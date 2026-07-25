@@ -24,6 +24,9 @@ class YouTubeStreamResolver(
     private val maxVideoQuality: Int
         get() = settings.getString("video_quality")?.toIntOrNull() ?: 480  
 
+    private val maxAudioQuality: Int
+        get() = settings.getString("audio_quality")?.toIntOrNull() ?: 256
+
     suspend fun resolveStreamable(videoId: String, preferVideos: Boolean): Streamable.Media {
         println("Loading streamable media for video ID: $videoId")
         
@@ -149,8 +152,15 @@ class YouTubeStreamResolver(
                 println("RealNewPipe No audio streams available")
                 return ExtractionResult.Failed
             }
+
+            val filteredAudioFormats = if (maxAudioQuality < Int.MAX_VALUE) {
+                audioFormats.filter { format ->
+                    val kbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
+                    kbps <= maxAudioQuality || kbps == 0
+                }.ifEmpty { audioFormats }
+            } else audioFormats
             
-            val audioSources = audioFormats.map { format ->
+            val audioSources = filteredAudioFormats.map { format ->
                 val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
                 Streamable.Source.Http(
                     request = NetworkRequest(url = format.url!!),
@@ -160,7 +170,7 @@ class YouTubeStreamResolver(
                 )
             }
             
-            println("RealNewPipe Returning ${audioSources.size} audio-only sources (instant playback)")
+            println("RealNewPipe Returning ${audioSources.size} audio-only sources (max ${maxAudioQuality}kbps)")
             return ExtractionResult.Success(Streamable.Media.Server(audioSources, merged = false))
         } catch (e: Exception) {
             println("RealNewPipe Exception: ${e.message}")
@@ -235,8 +245,15 @@ class YouTubeStreamResolver(
                 println("YtmKt No audio streams available")
                 return ExtractionResult.Error("No audio streams available")
             }
+
+            val filteredAudioFormats = if (maxAudioQuality < Int.MAX_VALUE) {
+                audioFormats.filter { format ->
+                    val kbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
+                    kbps <= maxAudioQuality || kbps == 0
+                }.ifEmpty { audioFormats }
+            } else audioFormats
             
-            val audioSources = audioFormats.map { format ->
+            val audioSources = filteredAudioFormats.map { format ->
                 val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
                 Streamable.Source.Http(
                     request = NetworkRequest(url = format.url!!),
@@ -299,8 +316,15 @@ class YouTubeStreamResolver(
                 println("YouTube Music API: No audio formats available")
                 return ExtractionResult.Error("No audio sources found in YouTube Music API response")
             }
+
+            val filteredAudioFormats = if (maxAudioQuality < Int.MAX_VALUE) {
+                audioFormats.filter { format ->
+                    val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 128
+                    bitrateKbps <= maxAudioQuality
+                }.ifEmpty { audioFormats }
+            } else audioFormats
             
-            val audioSources = audioFormats.map { format ->
+            val audioSources = filteredAudioFormats.map { format ->
                 val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 128
                 Streamable.Source.Http(
                     request = NetworkRequest(url = format.url!!),

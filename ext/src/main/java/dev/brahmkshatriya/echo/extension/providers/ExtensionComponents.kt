@@ -42,6 +42,9 @@ class ExtensionComponents(
     val maxVideoQuality: Int
         get() = settings.getString("video_quality")?.toIntOrNull() ?: 480  
 
+    val maxAudioQuality: Int
+        get() = settings.getString("audio_quality")?.toIntOrNull() ?: 256
+
     //Endpoints (API Communication)
     
     val visitorEndpoint = EchoVisitorEndpoint(api)
