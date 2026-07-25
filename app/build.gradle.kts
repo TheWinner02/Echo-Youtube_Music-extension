@@ -49,10 +49,21 @@ tasks.register("generateProguardRules") {
         generatedProguard.writeText(
             """
                 -dontobfuscate
-                -keep,allowoptimization class dev.brahmkshatriya.echo.extension.$extClass
-                -keep class dev.brahmkshatriya.echo.extension.endpoints.** { *; }
+                -dontoptimize
+                -dontwarn java.lang.management.**
+                -dontwarn io.ktor.**
+                -dontwarn org.slf4j.**
+                -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+                -keep class dev.brahmkshatriya.echo.extension.** { *; }
+                -keepclassmembers class dev.brahmkshatriya.echo.extension.** { *; }
                 -keep class dev.toastbits.ytmkt.** { *; }
-                -keepclassmembers class dev.brahmkshatriya.echo.extension.$extClass { *; }
+                -keepclassmembers class dev.toastbits.ytmkt.** { *; }
+                -keep class io.ktor.** { *; }
+                -keepclassmembers class io.ktor.** { *; }
+                -keep class kotlinx.serialization.** { *; }
+                -keepclassmembers class kotlinx.serialization.** { *; }
+                -keep class org.schabi.newpipe.** { *; }
+                -keepclassmembers class org.schabi.newpipe.** { *; }
                 """.trimIndent()
         )
     }
