@@ -56,10 +56,10 @@ val extAuthorUrl = project.findProperty("extAuthorUrl") as String?
 val extRepoUrl = project.findProperty("extRepoUrl") as String?
 val extUpdateUrl = project.findProperty("extUpdateUrl") as String?
 
-val gitHash = execute("git", "rev-parse", "HEAD").take(7)
-val gitCount = execute("git", "rev-list", "--count", "HEAD").toInt()
-val verCode = gitCount
-val verName = "v$gitHash"
+val verCode = (project.findProperty("extVersionCode") as? String)?.toIntOrNull()
+    ?: runCatching { execute("git", "rev-list", "--count", "HEAD").toInt() }.getOrDefault(1)
+val verName = (project.findProperty("extVersionName") as? String)
+    ?: runCatching { "v" + execute("git", "rev-parse", "HEAD").take(7) }.getOrDefault("v1.0.0")
 
 publishing {
     publications {
@@ -103,11 +103,11 @@ tasks {
     
     // Enable test tasks now that we have proper implementations
     test {
-        enabled = false
+        enabled = true
     }
     
     compileTestKotlin {
-        enabled = false
+        enabled = true
     }
 }
 

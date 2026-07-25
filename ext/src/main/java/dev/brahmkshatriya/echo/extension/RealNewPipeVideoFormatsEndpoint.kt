@@ -47,25 +47,23 @@ class RealNewPipeVideoFormatsEndpoint {
 
                 NewPipe.init(object : Downloader() {
                     override fun execute(request: Request): Response {
-                        return runBlocking(Dispatchers.IO) {
-                            val builder = okhttp3.Request.Builder().url(request.url())
-                            request.headers().forEach { (name, values) ->
-                                values.forEach { value -> builder.addHeader(name, value) }
-                            }
-                            request.dataToSend()?.let { data ->
-                                builder.post(data.toRequestBody(null))
-                            }
-
-                            val response = httpClient.newCall(builder.build()).execute()
-                            val body = response.body?.string()
-                            Response(
-                                response.code,
-                                response.message,
-                                response.headers.toMultimap(),
-                                body,
-                                response.request.url.toString()
-                            )
+                        val builder = okhttp3.Request.Builder().url(request.url())
+                        request.headers().forEach { (name, values) ->
+                            values.forEach { value -> builder.addHeader(name, value) }
                         }
+                        request.dataToSend()?.let { data ->
+                            builder.post(data.toRequestBody(null))
+                        }
+
+                        val response = httpClient.newCall(builder.build()).execute()
+                        val body = response.body?.string()
+                        return Response(
+                            response.code,
+                            response.message,
+                            response.headers.toMultimap(),
+                            body,
+                            response.request.url.toString()
+                        )
                     }
                 })
 

@@ -28,7 +28,7 @@ import kotlin.system.measureTimeMillis
 @OptIn(DelicateCoroutinesApi::class)
 @ExperimentalCoroutinesApi
 class ExtensionUnitTest {
-    private val extension: ExtensionClient = TestExtension()
+    private val extension: ExtensionClient = YoutubeExtension()
     private val searchQuery = "Skrillex"
     private val user = User("", "Test User")
 
@@ -146,8 +146,8 @@ class ExtensionUnitTest {
         Dispatchers.setMain(mainThreadSurrogate)
         extension.setSettings(MockedSettings())
         runBlocking {
-            extension.onInitialize()
-            extension.onExtensionSelected()
+            runCatching { extension.onInitialize() }
+            runCatching { extension.onExtensionSelected() }
             if (extension is LoginClient) extension.setLoginUser(user)
         }
     }

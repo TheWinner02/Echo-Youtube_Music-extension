@@ -91,7 +91,7 @@ class ExtensionComponents(
     }
 
     val radioGenerator by lazy {
-        RadioGenerator(api, json, thumbnailQuality, trackCache)
+        RadioGenerator(api, json, thumbnailQuality, trackCache, playlistEndpoint)
     }
 
     val playlistManager by lazy {
@@ -108,6 +108,12 @@ class ExtensionComponents(
 
     val shareManager = ShareManager()
     
-    // Track cache for album/playlist tracks
-    val trackCache = mutableMapOf<String, PagedData<Track>>()
+    // Thread-safe LRU Track cache for album/playlist tracks (max 50 items)
+    val trackCache: MutableMap<String, PagedData<Track>> = java.util.Collections.synchronizedMap(
+        object : java.util.LinkedHashMap<String, PagedData<Track>>(50, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, PagedData<Track>>?): Boolean {
+                return size > 50
+            }
+        }
+    )
 }

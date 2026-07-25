@@ -23,7 +23,8 @@ class RadioGenerator(
     private val api: YoutubeiApi,
     private val json: Json,
     private val thumbnailQuality: ThumbnailProvider.Quality,
-    private val trackCache: MutableMap<String, PagedData<Track>>
+    private val trackCache: MutableMap<String, PagedData<Track>>,
+    private val playlistEndpoint: dev.brahmkshatriya.echo.extension.endpoints.EchoPlaylistEndpoint? = null
 ) {
     suspend fun generateRadio(item: EchoMediaItem, context: EchoMediaItem? = null): Radio {
         return when (item) {
@@ -54,9 +55,18 @@ class RadioGenerator(
     }
 
     private suspend fun generateFromAlbum(album: Album): Radio {
-        val track = trackCache[album.id]?.toFeed()?.loadAll()?.lastOrNull()
-            ?: throw Exception("No tracks found")
-        return generateFromTrack(track, null)
+        val cachedTrack = trackCache[album.id]?.toFeed()?.loadAll()?.lastOrNull()
+        if (cachedTrack != null) {
+            return generateFromTrack(cachedTrack, null)
+        }
+        val firstArtist = album.artists.firstOrNull()
+        if (firstArtist != null) {
+            return generateFromArtist(firstArtist)
+        }
+        val loaded = runCatching { playlistEndpoint?.loadFromPlaylist(album.id, quality = thumbnailQuality) }.getOrNull()
+        val loadedTrack = loaded?.third?.toFeed()?.loadAll()?.lastOrNull()
+            ?: throw Exception("No tracks found for album ${album.title}")
+        return generateFromTrack(loadedTrack, null)
     }
 
     private suspend fun generateFromArtist(artist: Artist): Radio {
@@ -76,9 +86,14 @@ class RadioGenerator(
     }
 
     private suspend fun generateFromPlaylist(playlist: Playlist): Radio {
-        val track = trackCache[playlist.id]?.toFeed()?.loadAll()?.lastOrNull()
-            ?: throw Exception("No tracks found")
-        return generateFromTrack(track, null)
+        val cachedTrack = trackCache[playlist.id]?.toFeed()?.loadAll()?.lastOrNull()
+        if (cachedTrack != null) {
+            return generateFromTrack(cachedTrack, null)
+        }
+        val loaded = runCatching { playlistEndpoint?.loadFromPlaylist(playlist.id, quality = thumbnailQuality) }.getOrNull()
+        val loadedTrack = loaded?.third?.toFeed()?.loadAll()?.lastOrNull()
+            ?: throw Exception("No tracks found for playlist ${playlist.title}")
+        return generateFromTrack(loadedTrack, null)
     }
 
     private suspend fun generateFromUser(user: User): Radio {

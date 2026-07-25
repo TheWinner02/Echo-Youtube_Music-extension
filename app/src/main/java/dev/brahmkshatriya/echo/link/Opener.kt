@@ -14,10 +14,11 @@ class Opener : Activity() {
         super.onCreate(savedInstanceState)
         val uri = intent.data
         if (uri != null) {
-            val type = uri.pathSegments[0]
+            val segments = uri.pathSegments ?: emptyList()
+            val type = segments.getOrNull(0) ?: return
             val path = when (type) {
                 "channel" -> {
-                    val channelId = uri.pathSegments[1] ?: return
+                    val channelId = segments.getOrNull(1) ?: return
                     "artist/$channelId"
                 }
 
@@ -27,7 +28,7 @@ class Opener : Activity() {
                 }
 
                 "browse" -> {
-                    val browseId = uri.pathSegments[1] ?: return
+                    val browseId = segments.getOrNull(1) ?: return
                     "album/$browseId"
                 }
 

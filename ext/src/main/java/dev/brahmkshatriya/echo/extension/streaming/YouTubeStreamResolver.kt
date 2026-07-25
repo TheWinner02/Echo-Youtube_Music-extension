@@ -14,7 +14,8 @@ class YouTubeStreamResolver(
     private val videoEndpoint: dev.brahmkshatriya.echo.extension.endpoints.EchoVideoEndpoint,
     private val visitorEndpoint: dev.brahmkshatriya.echo.extension.endpoints.EchoVisitorEndpoint
 ) {
-    private fun getRealNewPipe() = RealNewPipeVideoFormatsEndpoint()
+    private val realNewPipeEndpoint by lazy { RealNewPipeVideoFormatsEndpoint() }
+    private fun getRealNewPipe() = realNewPipeEndpoint
     
     private val ytmKtEndpoint by lazy {
         dev.brahmkshatriya.echo.extension.YtmKtVideoFormatsEndpoint(api)

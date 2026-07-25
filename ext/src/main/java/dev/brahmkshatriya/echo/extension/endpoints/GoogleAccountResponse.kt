@@ -11,7 +11,10 @@ data class GoogleAccountResponse(
 ) {
 
     private fun getAccountList(): List<Pair<String?, AccountItem>> {
-        return data.actions[0].getMultiPageMenuAction.menu.multiPageMenuRenderer.sections[0].accountSectionListRenderer.run {
+        val action = data.actions.firstOrNull() ?: return emptyList()
+        val sections = action.getMultiPageMenuAction.menu.multiPageMenuRenderer.sections
+        val section = sections.firstOrNull() ?: return emptyList()
+        return section.accountSectionListRenderer.run {
             contents.map {
                 it.accountItemSectionRenderer.contents.mapNotNull { content ->
                     content.accountItem
@@ -31,17 +34,21 @@ data class GoogleAccountResponse(
             val signInUrl =
                 item.serviceEndpoint?.selectActiveIdentityEndpoint?.supportedTokens
                     ?.find { token -> token.accountSigninToken != null }
-                    ?.accountSigninToken?.signinUrl ?: return@mapNotNull null
-            val channelId = item.serviceEndpoint.selectActiveIdentityEndpoint.supportedTokens
-                .find { token -> token.offlineCacheKeyToken != null }
+                    ?.accountSigninToken?.signinUrl
+            val channelId = item.serviceEndpoint?.selectActiveIdentityEndpoint?.supportedTokens
+                ?.find { token -> token.offlineCacheKeyToken != null }
                 ?.offlineCacheKeyToken?.clientCacheKey
 
+            val extras = mutableMapOf("auth" to auth, "cookie" to cookie)
+            if (signInUrl != null) extras["signInUrl"] = signInUrl
+            if (email != null) extras["email"] = email
+
             User(
-                if (channelId != null) "UC$channelId" else "",
-                item.accountName.simpleText,
-                cover,
-                email,
-                mapOf("auth" to auth, "cookie" to cookie, "signInUrl" to signInUrl)
+                id = if (!channelId.isNullOrEmpty()) "UC$channelId" else "",
+                name = item.accountName.simpleText,
+                cover = cover,
+                subtitle = email ?: item.channelHandle?.simpleText ?: "YouTube Music User",
+                extras = extras
             )
         }
     }

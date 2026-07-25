@@ -72,16 +72,16 @@ class EchoPlaylistEndpoint(override val api: YoutubeiApi) : ApiEndpoint() {
         val songs = PagedData.Continuous { token ->
             if (token == null) {
                 val ytmSongs = playlist.items ?: emptyList()
-                val sets = playlist.item_set_ids!!
+                val sets = playlist.item_set_ids ?: emptyList()
                 Page(
-                    ytmSongs.mapIndexed { index, it -> it.toTrack(quality, sets[index]) },
+                    ytmSongs.mapIndexed { index, it -> it.toTrack(quality, sets.getOrNull(index)) },
                     playlist.continuation?.token
                 )
             } else {
                 val (songs, setIds, cont) = continuationEndpoint.load(token)
                 val ytmSongs = songs ?: emptyList()
                 val sets = setIds ?: emptyList()
-                Page(ytmSongs.mapIndexed { index, it -> it.toTrack(quality, sets[index]) }, cont)
+                Page(ytmSongs.mapIndexed { index, it -> it.toTrack(quality, sets.getOrNull(index)) }, cont)
             }
         }
         Triple(playlist, relation, songs)

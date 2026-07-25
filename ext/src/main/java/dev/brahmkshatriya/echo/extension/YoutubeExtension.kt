@@ -375,8 +375,8 @@ class YoutubeExtension : ExtensionClient, HomeFeedClient, TrackClient, SearchFee
         if (user == null) {
             api.user_auth_state = null
         } else {
-            val cookie = user.extras["cookie"] ?: throw Exception("No cookie")
-            val auth = user.extras["auth"] ?: throw Exception("No auth")
+            val cookie = user.extras["cookie"] ?: throw Exception("No cookie in user extras")
+            val auth = user.extras["auth"] ?: throw Exception("No auth in user extras")
 
             val headers = io.ktor.http.headers {
                 append("cookie", cookie)
@@ -386,7 +386,6 @@ class YoutubeExtension : ExtensionClient, HomeFeedClient, TrackClient, SearchFee
                 dev.toastbits.ytmkt.impl.youtubei.YoutubeiAuthenticationState(api, headers, user.id.ifEmpty { null })
             api.user_auth_state = authenticationState
         }
-        api.visitor_id = runCatching { kotlinx.coroutines.runBlocking { components.visitorEndpoint.getVisitorId() } }.getOrNull()
     }
 
     override suspend fun getCurrentUser(): User? {
@@ -426,7 +425,7 @@ class YoutubeExtension : ExtensionClient, HomeFeedClient, TrackClient, SearchFee
 
     override suspend fun onMarkAsPlayed(details: TrackDetails) {
         val authState = api.user_auth_state ?: return
-        val endpoint = authState.MarkSongAsWatched ?: return
+        val endpoint = authState.MarkSongAsWatched
         try {
             val result = endpoint.markSongAsWatched(details.track.id)
             if (result.isFailure) {

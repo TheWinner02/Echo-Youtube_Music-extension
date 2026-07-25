@@ -62,8 +62,10 @@ open class EchoSongEndPoint(override val api: YoutubeiApi) : ApiEndpoint() {
         val relatedBrowseId: String? =
             tabs.getOrNull(2)?.tabRenderer?.endpoint?.browseEndpoint?.browseId
 
-        val video: YoutubeiNextResponse.PlaylistPanelVideoRenderer =
-            tabs[0].tabRenderer.content!!.musicQueueRenderer.content!!.playlistPanelRenderer.contents.first().playlistPanelVideoRenderer!!
+        val firstItem = tabs.getOrNull(0)?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents?.firstOrNull()
+            ?: throw Exception("Playlist panel content missing in response")
+        val video: YoutubeiNextResponse.PlaylistPanelVideoRenderer = firstItem.getRenderer()
+            ?: throw Exception("PlaylistPanelVideoRenderer missing in response")
 
         val title: String = video.title.first_text
         val isLiked =
@@ -259,16 +261,12 @@ data class YoutubeiNextResponse(
         val playlistPanelVideoRenderer: PlaylistPanelVideoRenderer?,
         val playlistPanelVideoWrapperRenderer: PlaylistPanelVideoWrapperRenderer?
     ) {
-        private fun getRenderer(): PlaylistPanelVideoRenderer {
+        fun getRenderer(): PlaylistPanelVideoRenderer? {
             if (playlistPanelVideoRenderer != null) {
                 return playlistPanelVideoRenderer
             }
 
-            if (playlistPanelVideoWrapperRenderer == null) {
-                throw NotImplementedError("Unimplemented renderer object in ResponseRadioItem")
-            }
-
-            return playlistPanelVideoWrapperRenderer.primaryRenderer.getRenderer()
+            return playlistPanelVideoWrapperRenderer?.primaryRenderer?.getRenderer()
         }
     }
 
