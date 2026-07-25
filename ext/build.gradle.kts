@@ -42,19 +42,19 @@ dependencies {
 
 // Extension properties goto `gradle.properties` to set values
 
-val extType: String by project
-val extId: String by project
-val extClass: String by project
+val extType = project.property("extType") as String
+val extId = project.property("extId") as String
+val extClass = project.property("extClass") as String
 
-val extIconUrl: String? by project
-val extName: String by project
-val extDescription: String? by project
+val extIconUrl = project.findProperty("extIconUrl") as String?
+val extName = project.property("extName") as String
+val extDescription = project.findProperty("extDescription") as String?
 
-val extAuthor: String by project
-val extAuthorUrl: String? by project
+val extAuthor = project.property("extAuthor") as String
+val extAuthorUrl = project.findProperty("extAuthorUrl") as String?
 
-val extRepoUrl: String? by project
-val extUpdateUrl: String? by project
+val extRepoUrl = project.findProperty("extRepoUrl") as String?
+val extUpdateUrl = project.findProperty("extUpdateUrl") as String?
 
 val gitHash = execute("git", "rev-parse", "HEAD").take(7)
 val gitCount = execute("git", "rev-list", "--count", "HEAD").toInt()

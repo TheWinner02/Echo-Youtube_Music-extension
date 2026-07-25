@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
 }
 
 dependencies {
@@ -17,21 +16,24 @@ java {
 
 kotlin {
     jvmToolchain(17)
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 }
 
-val extType: String by project
-val extId: String by project
-val extClass: String by project
+val extType = project.property("extType") as String
+val extId = project.property("extId") as String
+val extClass = project.property("extClass") as String
 
-val extIconUrl: String? by project
-val extName: String by project
-val extDescription: String? by project
+val extIconUrl = project.findProperty("extIconUrl") as String?
+val extName = project.property("extName") as String
+val extDescription = project.findProperty("extDescription") as String?
 
-val extAuthor: String by project
-val extAuthorUrl: String? by project
+val extAuthor = project.property("extAuthor") as String
+val extAuthorUrl = project.findProperty("extAuthorUrl") as String?
 
-val extRepoUrl: String? by project
-val extUpdateUrl: String? by project
+val extRepoUrl = project.findProperty("extRepoUrl") as String?
+val extUpdateUrl = project.findProperty("extUpdateUrl") as String?
 
 val gitHash = execute("git", "rev-parse", "HEAD").take(7)
 val gitCount = execute("git", "rev-list", "--count", "HEAD").toInt()
@@ -62,16 +64,19 @@ tasks.named("preBuild") {
 }
 
 tasks.register("uninstall") {
-    android.run {
+    val android = extensions.getByType<com.android.build.api.dsl.ApplicationExtension>()
+    val androidComponents = extensions.getByType<com.android.build.api.variant.ApplicationAndroidComponentsExtension>()
+    doLast {
+        val adb = File(androidComponents.sdkComponents.sdkDirectory.get().asFile, "platform-tools/adb")
         execute(
-            adbExecutable.absolutePath, "shell", "pm", "uninstall", defaultConfig.applicationId!!
+            adb.absolutePath, "shell", "pm", "uninstall", android.defaultConfig.applicationId!!
         )
     }
 }
 
 android {
     namespace = "dev.brahmkshatriya.echo.extension"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         applicationId = "dev.brahmkshatriya.echo.extension.$extId"
         minSdk = 24
@@ -98,6 +103,7 @@ android {
     buildTypes {
         all {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -106,7 +112,8 @@ android {
         }
         
         debug {
-            isMinifyEnabled = false  
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 
@@ -114,10 +121,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 }
 
