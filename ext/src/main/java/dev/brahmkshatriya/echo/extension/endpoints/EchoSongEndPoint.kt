@@ -218,7 +218,7 @@ data class YoutubeiNextResponse(
     class TabRendererEndpoint(val browseEndpoint: BrowseEndpoint)
 
     @Serializable
-    class Content(val musicQueueRenderer: MusicQueueRenderer)
+    class Content(val musicQueueRenderer: MusicQueueRenderer? = null)
 
     @Serializable
     class MusicQueueRenderer(
