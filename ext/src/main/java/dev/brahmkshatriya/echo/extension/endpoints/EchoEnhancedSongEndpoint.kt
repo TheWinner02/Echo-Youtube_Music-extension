@@ -180,7 +180,7 @@ class EchoEnhancedSongEndpoint(
             Streamable.server(
                 id = "youtube_music_$videoId",
                 quality = 160,
-                title = "Opus 160 kbps",
+                title = "Opus",
                 extras = mapOf("videoId" to videoId)
             )
         )
