@@ -1,5 +1,7 @@
 package dev.brahmkshatriya.echo.extension.providers.playback
 
+import dev.brahmkshatriya.echo.extension.ExtensionText
+
 import dev.brahmkshatriya.echo.common.models.Streamable
 import dev.brahmkshatriya.echo.common.models.Track
 import dev.brahmkshatriya.echo.extension.auth.YouTubeAuthManager
@@ -34,15 +36,15 @@ class TrackLoader(
         when (streamable.type) {
             Streamable.MediaType.Server -> {
                 val videoId = streamable.extras["videoId"]
-                    ?: throw Exception("No video ID found. This track may not be playable.")
+                    ?: throw Exception(ExtensionText.get("providers.no_video_id_found_this_track_may_not_be_playable_83575d", "No video ID found. This track may not be playable."))
 
                 return streamResolver.resolveStreamable(videoId, preferVideos)
             }
             Streamable.MediaType.Background -> {
-                throw Exception("Background streamables not supported")
+                throw Exception(ExtensionText.get("providers.background_streamables_not_supported_3bd1af", "Background streamables not supported"))
             }
             Streamable.MediaType.Subtitle -> {
-                throw Exception("Subtitles not supported")
+                throw Exception(ExtensionText.get("providers.subtitles_not_supported_98a8c0", "Subtitles not supported"))
             }
         }
     }

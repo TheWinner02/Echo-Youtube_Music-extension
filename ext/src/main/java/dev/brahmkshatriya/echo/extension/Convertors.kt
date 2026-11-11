@@ -108,8 +108,8 @@ suspend fun MediaItemLayout.toShelf(
         println("Failed to create shelf: ${e.message}")
         Shelf.Lists.Items(
             id = "error-${System.currentTimeMillis()}",
-            title = "Content unavailable",
-            subtitle = "Unable to load this content",
+            title = ExtensionText.get("providers.content_unavailable_e9f250", "Content unavailable"),
+            subtitle = ExtensionText.get("providers.unable_to_load_this_content_6e8245", "Unable to load this content"),
             list = emptyList(),
             more = null
         )
@@ -166,7 +166,7 @@ fun YtmPlaylist.toPlaylist(
         println("Failed to convert YtmPlaylist to Playlist: ${e.message}")
         Playlist(
             id = id,
-            title = name ?: "Unknown Playlist",
+            title = name ?: ExtensionText.get("providers.unknown_playlist_d05c4d", "Unknown Playlist"),
             isEditable = false,
             cover = null,
             authors = emptyList(),
@@ -205,7 +205,7 @@ fun YtmPlaylist.toAlbum(
         println("Failed to convert YtmPlaylist to Album: ${e.message}")
         Album(
             id = id,
-            title = name ?: "Unknown Album",
+            title = name ?: ExtensionText.get("providers.unknown_album_7548af", "Unknown Album"),
             isExplicit = false,
             cover = null,
             artists = emptyList(),
@@ -260,7 +260,7 @@ fun YtmSong.toTrack(
         println("Failed to convert YtmSong to Track: ${e.message}")
         Track(
             id = id,
-            title = name ?: "Unknown Track",
+            title = name ?: ExtensionText.get("providers.unknown_track_33b223", "Unknown Track"),
             type = Track.Type.Song,
             artists = emptyList(),
             cover = getCover(id, quality),
@@ -311,7 +311,7 @@ fun YtmArtist.toArtist(
         println("Failed to convert YtmArtist to Artist: ${e.message}")
         Artist(
             id = id,
-            name = name ?: "Unknown Artist",
+            name = name ?: ExtensionText.get("providers.unknown_artist_fc0fb2", "Unknown Artist"),
             cover = null,
             bio = null,
             extras = mapOf("genuineArtist" to "true")
@@ -327,7 +327,7 @@ fun YtmArtist.toUser(
             when {
                 count >= 1000000 -> "${(count / 1000000).toInt()}M subscribers"
                 count >= 1000 -> "${(count / 1000).toInt()}K subscribers"
-                else -> "$count subscribers"
+                else -> ExtensionText.get("providers.1_d_subscribers_38c2a2", "%1\$d subscribers", count)
             }
         } ?: "Artist"
         
@@ -351,9 +351,9 @@ fun YtmArtist.toUser(
         println("Failed to convert YtmArtist to User: ${e.message}")
         User(
             id = id,
-            name = name ?: "Unknown User",
+            name = name ?: ExtensionText.get("providers.unknown_user_bd47bc", "Unknown User"),
             cover = null,
-            subtitle = "Artist",
+            subtitle = ExtensionText.get("providers.artist_1d3981", "Artist"),
             extras = mapOf("isArtist" to "true", "userType" to "artist")
         )
     }
@@ -366,7 +366,7 @@ fun User.toArtist(): Artist {
         println("Failed to convert User to Artist: ${e.message}")
         Artist(
             id = id,
-            name = name ?: "Unknown Artist",
+            name = name ?: ExtensionText.get("providers.unknown_artist_fc0fb2", "Unknown Artist"),
             cover = cover,
             bio = subtitle,
             extras = extras.toMutableMap().apply { put("genuineArtist", "true") }

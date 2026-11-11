@@ -1,5 +1,7 @@
 package dev.brahmkshatriya.echo.extension
 
+import dev.brahmkshatriya.echo.common.providers.GlobalSettingsProvider
+
 import dev.brahmkshatriya.echo.common.clients.AlbumClient
 import dev.brahmkshatriya.echo.common.clients.ArtistClient
 import dev.brahmkshatriya.echo.common.clients.ExtensionClient
@@ -88,34 +90,38 @@ private fun createShelfPagedDataFromMediaItems(mediaItems: PagedData<EchoMediaIt
 class YoutubeExtension : ExtensionClient, HomeFeedClient, TrackClient, SearchFeedClient,
     RadioClient, AlbumClient, ArtistClient, PlaylistClient, LoginClient.WebView,
     TrackerClient, TrackerMarkClient, LibraryFeedClient, ShareClient, LyricsClient, FollowClient,
-    LikeClient, PlaylistEditClient, LyricsSearchClient, QuickSearchClient {
+    LikeClient, PlaylistEditClient, LyricsSearchClient, QuickSearchClient, GlobalSettingsProvider {
+    override fun setGlobalSettings(globalSettings: Settings) {
+        ExtensionText.settings = globalSettings
+    }
+
 
     override suspend fun getSettingItems(): List<Setting> = listOf(
         SettingSwitch(
-            "High Thumbnail Quality",
+            ExtensionText.get("providers.high_thumbnail_quality_366638", "High Thumbnail Quality"),
             "high_quality",
-            "Use high quality thumbnails, will cause more data usage.",
+            ExtensionText.get("providers.use_high_quality_thumbnails_will_cause_more_data_4a8f49", "Use high quality thumbnails, will cause more data usage."),
             true
         ),
         SettingSwitch(
-            "Prefer Videos",
+            ExtensionText.get("providers.prefer_videos_780643", "Prefer Videos"),
             "prefer_videos",
-            "Prefer videos over audio when available.",
+            ExtensionText.get("providers.prefer_videos_over_audio_when_available_e6d1a0", "Prefer videos over audio when available."),
             false
         ),
         SettingList(
-            "Video Quality [Most of Time only 360p is available]",
+            ExtensionText.get("providers.video_quality_most_of_time_only_360p_is_availabl_32db7e", "Video Quality [Most of Time only 360p is available]"),
             "video_quality",
-            "Maximum video quality for playback. Higher quality uses more data and may buffer more.",
-            entryTitles = listOf("360p", "480p", "720p", "Best Available"),
+            ExtensionText.get("providers.maximum_video_quality_for_playback_higher_qualit_58ed84", "Maximum video quality for playback. Higher quality uses more data and may buffer more."),
+            entryTitles = listOf("360p", "480p", "720p", ExtensionText.get("providers.best_available_23784f", "Best Available")),
             entryValues = listOf("360", "480", "720", "999999"),
             defaultEntryIndex = 1  
         ),
         SettingList(
-            "Audio Quality",
+            ExtensionText.get("providers.audio_quality_25b5fc", "Audio Quality"),
             "audio_quality",
-            "Maximum audio bitrate for playback. Higher quality uses more data.",
-            entryTitles = listOf("Low (64 kbps)", "Standard (128 kbps)", "High / Opus (160-256 kbps)", "Best Available"),
+            ExtensionText.get("providers.maximum_audio_bitrate_for_playback_higher_qualit_c61efe", "Maximum audio bitrate for playback. Higher quality uses more data."),
+            entryTitles = listOf(ExtensionText.get("providers.low_64_kbps_0d30be", "Low (64 kbps)"), ExtensionText.get("providers.standard_128_kbps_78c5aa", "Standard (128 kbps)"), ExtensionText.get("providers.high_opus_160_256_kbps_c2503e", "High / Opus (160-256 kbps)"), ExtensionText.get("providers.best_available_23784f", "Best Available")),
             entryValues = listOf("64", "128", "256", "999999"),
             defaultEntryIndex = 2
         )
@@ -365,7 +371,7 @@ class YoutubeExtension : ExtensionClient, HomeFeedClient, TrackClient, SearchFee
         override suspend fun onStop(url: NetworkRequest, cookie: String): List<User> {
             val cookieMap = CookieParser.parse(cookie)
             val sapisid = CookieParser.getSapisid(cookieMap)
-                ?: throw Exception("Login Failed SAPISID cookie not found or empty. Please try logging in again.")
+                ?: throw Exception(ExtensionText.get("providers.login_failed_sapisid_cookie_not_found_or_empty_p_097402", "Login Failed SAPISID cookie not found or empty. Please try logging in again."))
             
             val auth = CookieParser.generateSapisidHash(sapisid)
             val headersMap = mutableMapOf("cookie" to cookie, "authorization" to auth)

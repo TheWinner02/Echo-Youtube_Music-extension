@@ -1,5 +1,7 @@
 package dev.brahmkshatriya.echo.extension.providers.feeds
 
+import dev.brahmkshatriya.echo.extension.ExtensionText
+
 import dev.brahmkshatriya.echo.common.helpers.Page
 import dev.brahmkshatriya.echo.common.helpers.PagedData
 import dev.brahmkshatriya.echo.common.models.Feed
@@ -28,12 +30,12 @@ class SearchFeedProvider(
             return loadBrowseFeed(thumbnailQuality)
         }
         val tabs = listOf(
-            Tab("all", "All"),
-            Tab("songs", "Songs"),
-            Tab("videos", "Videos"),
-            Tab("albums", "Albums"),
-            Tab("artists", "Artists"),
-            Tab("playlists", "Playlists")
+            Tab("all", ExtensionText.get("providers.all_a52ace", "All")),
+            Tab("songs", ExtensionText.get("providers.songs_bc6761", "Songs")),
+            Tab("videos", ExtensionText.get("providers.videos_c9a963", "Videos")),
+            Tab("albums", ExtensionText.get("providers.albums_57bca6", "Albums")),
+            Tab("artists", ExtensionText.get("providers.artists_94e3e8", "Artists")),
+            Tab("playlists", ExtensionText.get("providers.playlists_dcd0a4", "Playlists"))
         )
 
         return Feed(tabs) { tab ->

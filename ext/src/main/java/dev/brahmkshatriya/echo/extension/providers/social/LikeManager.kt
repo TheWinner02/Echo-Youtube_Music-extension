@@ -1,5 +1,7 @@
 package dev.brahmkshatriya.echo.extension.providers.social
 
+import dev.brahmkshatriya.echo.extension.ExtensionText
+
 import dev.brahmkshatriya.echo.common.models.EchoMediaItem
 import dev.brahmkshatriya.echo.common.models.Track
 import dev.brahmkshatriya.echo.extension.auth.YouTubeAuthManager
@@ -11,7 +13,7 @@ class LikeManager(
 ) {
     suspend fun setLiked(item: EchoMediaItem, shouldLike: Boolean) {
         val track = item as? Track 
-            ?: throw Exception("Only tracks can be liked")
+            ?: throw Exception(ExtensionText.get("providers.only_tracks_can_be_liked_cb33ae", "Only tracks can be liked"))
         
         val auth = authManager.requireAuth()
         val likeStatus = if (shouldLike) SongLikedStatus.LIKED else SongLikedStatus.NEUTRAL

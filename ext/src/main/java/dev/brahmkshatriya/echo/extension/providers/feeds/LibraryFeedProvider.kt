@@ -1,5 +1,7 @@
 package dev.brahmkshatriya.echo.extension.providers.feeds
 
+import dev.brahmkshatriya.echo.extension.ExtensionText
+
 import dev.brahmkshatriya.echo.common.helpers.Page
 import dev.brahmkshatriya.echo.common.helpers.PagedData
 import dev.brahmkshatriya.echo.common.models.EchoMediaItem
@@ -22,7 +24,7 @@ class LibraryFeedProvider(
         val tabs = listOf(
             Tab(
                 id = "FEmusic_library_landing",
-                title = "All",
+                title = ExtensionText.get("providers.all_a52ace", "All"),
                 isSort = false,
                 extras = mapOf(
                     "browseId" to "FEmusic_library_landing",
@@ -33,7 +35,7 @@ class LibraryFeedProvider(
             ),
             Tab(
                 id = "FEmusic_history",
-                title = "History",
+                title = ExtensionText.get("providers.history_0e7696", "History"),
                 isSort = false,
                 extras = mapOf(
                     "browseId" to "FEmusic_history",
@@ -44,7 +46,7 @@ class LibraryFeedProvider(
             ),
             Tab(
                 id = "FEmusic_liked_playlists",
-                title = "Playlists",
+                title = ExtensionText.get("providers.playlists_dcd0a4", "Playlists"),
                 isSort = false,
                 extras = mapOf(
                     "browseId" to "FEmusic_liked_playlists",
@@ -55,7 +57,7 @@ class LibraryFeedProvider(
             ),
             Tab(
                 id = "FEmusic_liked_videos",
-                title = "Songs",
+                title = ExtensionText.get("providers.songs_bc6761", "Songs"),
                 isSort = false,
                 extras = mapOf(
                     "browseId" to "FEmusic_liked_videos",
@@ -66,7 +68,7 @@ class LibraryFeedProvider(
             ),
             Tab(
                 id = "FEmusic_library_corpus_track_artists",
-                title = "Artists",
+                title = ExtensionText.get("providers.artists_94e3e8", "Artists"),
                 isSort = false,
                 extras = mapOf(
                     "browseId" to "FEmusic_library_corpus_track_artists",

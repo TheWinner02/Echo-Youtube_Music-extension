@@ -1,5 +1,7 @@
 package dev.brahmkshatriya.echo.extension.auth
 
+import dev.brahmkshatriya.echo.extension.ExtensionText
+
 import dev.brahmkshatriya.echo.common.helpers.ClientException
 import dev.brahmkshatriya.echo.common.models.User
 import dev.brahmkshatriya.echo.extension.endpoints.EchoVisitorEndpoint
@@ -54,7 +56,7 @@ class YouTubeAuthManager(
 
         ensureVisitorId().getOrNull()
 
-        getCurrentUser().getOrThrow() ?: throw Exception("Failed to retrieve user information after login")
+        getCurrentUser().getOrThrow() ?: throw Exception(ExtensionText.get("providers.failed_to_retrieve_user_information_after_login_ac57f9", "Failed to retrieve user information after login"))
     }
 
     fun logout() {

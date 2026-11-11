@@ -1,5 +1,7 @@
 package dev.brahmkshatriya.echo.extension.providers.playback
 
+import dev.brahmkshatriya.echo.extension.ExtensionText
+
 import dev.brahmkshatriya.echo.common.models.Album
 import dev.brahmkshatriya.echo.common.models.Artist
 import dev.brahmkshatriya.echo.common.models.EchoMediaItem
@@ -46,7 +48,7 @@ class RadioGenerator(
         
         return Radio(
             id = id,
-            title = "${track.title} Radio",
+            title = ExtensionText.get("providers.radio_1_s_736db9", "Radio: %1\$s", track.title),
             extras = mutableMapOf<String, String>().apply {
                 put("tracks", json.encodeToString(tracks))
                 result.continuation?.let { put("cont", it) }
@@ -78,7 +80,7 @@ class RadioGenerator(
         
         return Radio(
             id = id,
-            title = "${artist.name} Radio",
+            title = ExtensionText.get("providers.radio_1_s_736db9", "Radio: %1\$s", artist.name),
             extras = mutableMapOf<String, String>().apply {
                 put("tracks", json.encodeToString(tracks))
             }
@@ -104,7 +106,7 @@ class RadioGenerator(
     fun loadRadioTracks(radio: Radio): Feed<Track> {
         return PagedData.Single { 
             val tracksJson = radio.extras["tracks"] 
-                ?: throw Exception("No tracks found in radio")
+                ?: throw Exception(ExtensionText.get("providers.no_tracks_found_in_radio_279868", "No tracks found in radio"))
             json.decodeFromString<List<Track>>(tracksJson)
         }.toFeed()
     }

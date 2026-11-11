@@ -1,5 +1,7 @@
 package dev.brahmkshatriya.echo.extension.streaming
 
+import dev.brahmkshatriya.echo.extension.ExtensionText
+
 import dev.brahmkshatriya.echo.common.models.NetworkRequest
 import dev.brahmkshatriya.echo.common.models.Streamable
 import dev.brahmkshatriya.echo.common.settings.Settings
@@ -175,14 +177,14 @@ class YouTubeStreamResolver(
         } catch (e: Exception) {
             println("RealNewPipe Exception: ${e.message}")
             e.printStackTrace()
-            val errorMsg = e.message ?: "Unknown error"
+            val errorMsg = e.message ?: ExtensionText.get("providers.unknown_error_27c2cc", "Unknown error")
             return when {
                 errorMsg.contains("age", ignoreCase = true) || errorMsg.contains("restricted", ignoreCase = true) -> 
-                    ExtractionResult.Error("Age-restricted content (Not playable at the moment)")
+                    ExtractionResult.Error(ExtensionText.get("providers.age_restricted_content_not_playable_at_the_momen_2f5cdb", "Age-restricted content (Not playable at the moment)"))
                 errorMsg.contains("geo", ignoreCase = true) || errorMsg.contains("region", ignoreCase = true) || errorMsg.contains("blocked", ignoreCase = true) -> 
-                    ExtractionResult.Error("Geo-blocked (Seems not available in your region)")
+                    ExtractionResult.Error(ExtensionText.get("providers.geo_blocked_seems_not_available_in_your_region_063141", "Geo-blocked (Seems not available in your region)"))
                 errorMsg.contains("unavailable", ignoreCase = true) -> 
-                    ExtractionResult.Error("Video unavailable")
+                    ExtractionResult.Error(ExtensionText.get("providers.video_unavailable_6b9f63", "Video unavailable"))
                 else -> ExtractionResult.Error(errorMsg)
             }
         }
@@ -243,7 +245,7 @@ class YouTubeStreamResolver(
             
             if (audioFormats.isEmpty()) {
                 println("YtmKt No audio streams available")
-                return ExtractionResult.Error("No audio streams available")
+                return ExtractionResult.Error(ExtensionText.get("providers.no_audio_streams_available_9c8472", "No audio streams available"))
             }
 
             val filteredAudioFormats = if (maxAudioQuality < Int.MAX_VALUE) {
@@ -268,7 +270,7 @@ class YouTubeStreamResolver(
         } catch (e: Exception) {
             println("YtmKt: Exception: ${e.message}")
             e.printStackTrace()
-            val errorMsg = e.message ?: "Unknown error"
+            val errorMsg = e.message ?: ExtensionText.get("providers.unknown_error_27c2cc", "Unknown error")
             return ExtractionResult.Error(errorMsg)
         }
     }
@@ -339,7 +341,7 @@ class YouTubeStreamResolver(
         } catch (e: Exception) {
             println("YouTube Music API also failed: ${e.message}")
             e.printStackTrace()
-            val errorMsg = e.message ?: "Unknown error"
+            val errorMsg = e.message ?: ExtensionText.get("providers.unknown_error_27c2cc", "Unknown error")
             return ExtractionResult.Error(errorMsg)
         }
     }
