@@ -32,7 +32,7 @@ class EchoVideoEndpoint(override val api: YoutubeiApi) : ApiEndpoint() {
     suspend fun getVideo(resolve: Boolean, id: String, playlist: String? = null) = coroutineScope {
         val web = async {
             if (resolve) request(webRemix, id, playlist)
-                .body<YoutubeFormatResponse>().videoDetails.musicVideoType
+                .body<YoutubeFormatResponse>().videoDetails?.musicVideoType
             else null
         }
         val ios = request(iosContext(), id, playlist).body<YoutubeFormatResponse>()
@@ -63,12 +63,12 @@ class EchoVideoEndpoint(override val api: YoutubeiApi) : ApiEndpoint() {
 data class YoutubeFormatResponse(
     val playabilityStatus: PlayabilityStatus? = null,
     val streamingData: StreamingData? = null,
-    val videoDetails: VideoDetails
+    val videoDetails: VideoDetails? = null
 )
 
 @Serializable
 data class PlayabilityStatus(
-    val status: String,
+    val status: String? = null,
     val reason: String? = null,
     val playableInEmbed: Boolean? = null
 )
@@ -77,6 +77,7 @@ data class PlayabilityStatus(
 data class StreamingData(
     val expiresInSeconds: String? = null,
     val hlsManifestUrl: String? = null,
+    val formats: List<AdaptiveFormat> = emptyList(),
     val adaptiveFormats: List<AdaptiveFormat> = emptyList()
 )
 
@@ -86,8 +87,8 @@ data class AdaptiveFormat(
     val url: String? = null,
     val signatureCipher: String? = null,
     val cipher: String? = null,
-    val mimeType: String,
-    val bitrate: Int,
+    val mimeType: String? = null,
+    val bitrate: Long? = null,
     val width: Long? = null,
     val height: Long? = null,
     val initRange: Range? = null,
@@ -123,7 +124,7 @@ data class Range(
 
 @Serializable
 data class VideoDetails(
-    val videoId: String, 
+    val videoId: String? = null,
     val title: String? = null,
     val lengthSeconds: String? = null,
     val channelId: String? = null,

@@ -36,6 +36,7 @@ class TrackLoader(
         when (streamable.type) {
             Streamable.MediaType.Server -> {
                 val videoId = streamable.extras["videoId"]?.takeIf { it.isNotBlank() }
+                    ?: streamable.id.removePrefix("youtube_music_").takeIf { it.isNotBlank() }
                     ?: throw Exception(ExtensionText.get("providers.no_video_id_found_this_track_may_not_be_playable_83575d", "No video ID found. This track may not be playable."))
 
                 return streamResolver.resolveStreamable(videoId, preferVideos)

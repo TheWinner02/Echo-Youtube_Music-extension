@@ -179,6 +179,7 @@ class EchoEnhancedSongEndpoint(
      * Create default streamable configuration.
      */
     private fun createDefaultStreamable(videoId: String): List<Streamable> {
+        if (videoId.isBlank()) return emptyList()
         return listOf(
             Streamable.server(
                 id = "youtube_music_$videoId",

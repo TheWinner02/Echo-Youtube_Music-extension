@@ -9,7 +9,6 @@ import dev.brahmkshatriya.echo.extension.RealNewPipeVideoFormatsEndpoint
 import dev.brahmkshatriya.echo.extension.utils.RetryUtils
 import dev.toastbits.ytmkt.impl.youtubei.YoutubeiApi
 
-
 class YouTubeStreamResolver(
     private val api: YoutubeiApi,
     private val settings: Settings,
@@ -41,12 +40,11 @@ class YouTubeStreamResolver(
         }
     }
     
-   //Three-tier fallback strategy
-
+    // Three-tier fallback strategy: RealNewPipe first, then YtmKt, then YouTube Music API
     private suspend fun resolveStreamableInternal(videoId: String, preferVideos: Boolean): Streamable.Media {
         val errorReasons = mutableListOf<String>()
         
-        //RealNewPipe
+        // 1. RealNewPipe
         println("RealNewPipe extractor for video ID: $videoId, preferVideos: $preferVideos")
         val realNewPipeResult = tryRealNewPipeExtractor(videoId, preferVideos)
         if (realNewPipeResult is ExtractionResult.Success) {
@@ -56,7 +54,7 @@ class YouTubeStreamResolver(
             errorReasons.add("RealNewPipe: ${realNewPipeResult.reason}")
         }
         
-        //MultipleVideoFormatsEndpoint
+        // 2. MultipleVideoFormatsEndpoint (YtmKt)
         println("RealNewPipe failed, trying YtmKt MultipleVideoFormatsEndpoint for video ID: $videoId")
         val ytmKtResult = tryYtmKtEndpoint(videoId, preferVideos)
         if (ytmKtResult is ExtractionResult.Success) {
@@ -66,7 +64,7 @@ class YouTubeStreamResolver(
             errorReasons.add("YtmKt: ${ytmKtResult.reason}")
         }
         
-        //YouTube Music API 
+        // 3. YouTube Music API
         println("YtmKt failed, trying YouTube Music API for video ID: $videoId")
         val youtubeMusicResult = tryYouTubeMusicApi(videoId, preferVideos)
         if (youtubeMusicResult is ExtractionResult.Success) {
@@ -90,7 +88,6 @@ class YouTubeStreamResolver(
         data class Error(val reason: String) : ExtractionResult()
         object Failed : ExtractionResult()
     }
-    
 
     private suspend fun tryRealNewPipeExtractor(videoId: String, preferVideos: Boolean): ExtractionResult {
         return try {
@@ -119,7 +116,7 @@ class YouTubeStreamResolver(
                         println("RealNewPipe No muxed streams match quality setting ${maxVideoQuality}p, trying audio-only fallback")
                     } else {
                         val muxedSources = muxedFormats.map { format ->
-                            val qualityKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
+                            val qualityKbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
                             Streamable.Source.Http(
                                 request = NetworkRequest(url = format.url!!),
                                 type = Streamable.SourceType.Progressive,
@@ -143,8 +140,9 @@ class YouTubeStreamResolver(
             )
             
             if (streamsResult.isFailure) {
-                println("RealNewPipe Failed to get audio streams: ${streamsResult.exceptionOrNull()?.message}")
-                return ExtractionResult.Failed
+                val err = streamsResult.exceptionOrNull()?.message ?: "Extraction failed"
+                println("RealNewPipe Failed to get audio streams: $err")
+                return ExtractionResult.Error(err)
             }
             
             val (_, audioFormats) = streamsResult.getOrThrow()
@@ -152,18 +150,18 @@ class YouTubeStreamResolver(
             
             if (audioFormats.isEmpty()) {
                 println("RealNewPipe No audio streams available")
-                return ExtractionResult.Failed
+                return ExtractionResult.Error("No audio streams found")
             }
 
             val filteredAudioFormats = if (maxAudioQuality < Int.MAX_VALUE) {
                 audioFormats.filter { format ->
-                    val kbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
+                    val kbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
                     kbps <= maxAudioQuality || kbps == 0
                 }.ifEmpty { audioFormats }
             } else audioFormats
             
             val audioSources = filteredAudioFormats.map { format ->
-                val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
+                val bitrateKbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
                 Streamable.Source.Http(
                     request = NetworkRequest(url = format.url!!),
                     type = Streamable.SourceType.Progressive,
@@ -215,7 +213,7 @@ class YouTubeStreamResolver(
                     
                     if (muxedFormats.isNotEmpty()) {
                         val muxedSources = muxedFormats.map { format ->
-                            val qualityKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
+                            val qualityKbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
                             Streamable.Source.Http(
                                 request = NetworkRequest(url = format.url!!),
                                 type = Streamable.SourceType.Progressive,
@@ -250,13 +248,13 @@ class YouTubeStreamResolver(
 
             val filteredAudioFormats = if (maxAudioQuality < Int.MAX_VALUE) {
                 audioFormats.filter { format ->
-                    val kbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
+                    val kbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
                     kbps <= maxAudioQuality || kbps == 0
                 }.ifEmpty { audioFormats }
             } else audioFormats
             
             val audioSources = filteredAudioFormats.map { format ->
-                val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
+                val bitrateKbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
                 Streamable.Source.Http(
                     request = NetworkRequest(url = format.url!!),
                     type = Streamable.SourceType.Progressive,
@@ -274,7 +272,7 @@ class YouTubeStreamResolver(
             return ExtractionResult.Error(errorMsg)
         }
     }
-    
+
     private suspend fun tryYouTubeMusicApi(videoId: String, preferVideos: Boolean): ExtractionResult {
         return try {
             println("Falling back to YouTube Music API for video ID: $videoId")
@@ -310,7 +308,7 @@ class YouTubeStreamResolver(
             println("YouTube Music API Got ${adaptiveFormats.size} adaptive formats")
             
             val audioFormats = adaptiveFormats
-                .filter { it.mimeType.lowercase().contains("audio/") && it.url != null }
+                .filter { it.mimeType?.lowercase()?.contains("audio/") == true && it.url != null }
             
             println("YouTube Music API: ${audioFormats.size} audio formats found")
             
@@ -321,18 +319,18 @@ class YouTubeStreamResolver(
 
             val filteredAudioFormats = if (maxAudioQuality < Int.MAX_VALUE) {
                 audioFormats.filter { format ->
-                    val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 128
+                    val bitrateKbps = if ((format.bitrate ?: 0L) > 0L) ((format.bitrate ?: 0L) / 1000L).toInt() else 128
                     bitrateKbps <= maxAudioQuality
                 }.ifEmpty { audioFormats }
             } else audioFormats
             
             val audioSources = filteredAudioFormats.map { format ->
-                val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 128
+                val bitrateKbps = if ((format.bitrate ?: 0L) > 0L) ((format.bitrate ?: 0L) / 1000L).toInt() else 128
                 Streamable.Source.Http(
                     request = NetworkRequest(url = format.url!!),
                     type = Streamable.SourceType.Progressive,
                     quality = bitrateKbps,
-                    title = "Audio - ${format.mimeType}${if (format.bitrate > 0) " - ${bitrateKbps}kbps" else ""}"
+                    title = "Audio - ${format.mimeType}${if ((format.bitrate ?: 0L) > 0L) " - ${bitrateKbps}kbps" else ""}"
                 )
             }
             
