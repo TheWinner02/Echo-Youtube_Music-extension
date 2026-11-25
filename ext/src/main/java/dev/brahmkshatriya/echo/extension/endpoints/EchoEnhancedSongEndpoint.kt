@@ -28,6 +28,9 @@ class EchoEnhancedSongEndpoint(
         fallbackTrack: Track,
         thumbnailQuality: ThumbnailProvider.Quality
     ): Track {
+        if (trackId.isBlank()) {
+            error("Cannot load enhanced track with blank trackId")
+        }
         println("EchoEnhancedSongEndpoint: Loading track $trackId, fallback isVideo=${fallbackTrack.extras["isVideo"]}")
         
         // Try ytm-kt first (faster, better quality data)
