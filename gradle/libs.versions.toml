@@ -1,9 +1,9 @@
 [versions]
 echoCommon = "1.0.0"
-kotlin = "2.4.10"
-agp = "9.3.1"
+kotlin = "2.4.21"
+agp = "9.5.3"
 gradleShadow = "9.6.1"
-ktor = "3.5.2"
+ktor = "3.6.2"
 ytmkt = "0.4.3"  
 newpipe = "v0.27.1"
 desugarJdkLibs = "2.1.5"
