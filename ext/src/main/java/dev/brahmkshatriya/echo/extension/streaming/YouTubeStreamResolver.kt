@@ -116,7 +116,7 @@ class YouTubeStreamResolver(
                         println("RealNewPipe No muxed streams match quality setting ${maxVideoQuality}p, trying audio-only fallback")
                     } else {
                         val muxedSources = muxedFormats.map { format ->
-                            val qualityKbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
+                            val qualityKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
                             Streamable.Source.Http(
                                 request = NetworkRequest(url = format.url!!),
                                 type = Streamable.SourceType.Progressive,
@@ -155,13 +155,13 @@ class YouTubeStreamResolver(
 
             val filteredAudioFormats = if (maxAudioQuality < Int.MAX_VALUE) {
                 audioFormats.filter { format ->
-                    val kbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
+                    val kbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
                     kbps <= maxAudioQuality || kbps == 0
                 }.ifEmpty { audioFormats }
             } else audioFormats
             
             val audioSources = filteredAudioFormats.map { format ->
-                val bitrateKbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
+                val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
                 Streamable.Source.Http(
                     request = NetworkRequest(url = format.url!!),
                     type = Streamable.SourceType.Progressive,
@@ -213,7 +213,7 @@ class YouTubeStreamResolver(
                     
                     if (muxedFormats.isNotEmpty()) {
                         val muxedSources = muxedFormats.map { format ->
-                            val qualityKbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
+                            val qualityKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
                             Streamable.Source.Http(
                                 request = NetworkRequest(url = format.url!!),
                                 type = Streamable.SourceType.Progressive,
@@ -248,13 +248,13 @@ class YouTubeStreamResolver(
 
             val filteredAudioFormats = if (maxAudioQuality < Int.MAX_VALUE) {
                 audioFormats.filter { format ->
-                    val kbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
+                    val kbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
                     kbps <= maxAudioQuality || kbps == 0
                 }.ifEmpty { audioFormats }
             } else audioFormats
             
             val audioSources = filteredAudioFormats.map { format ->
-                val bitrateKbps = if (format.bitrate > 0) (format.bitrate / 1000).toInt() else 0
+                val bitrateKbps = if (format.bitrate > 0) format.bitrate / 1000 else 0
                 Streamable.Source.Http(
                     request = NetworkRequest(url = format.url!!),
                     type = Streamable.SourceType.Progressive,

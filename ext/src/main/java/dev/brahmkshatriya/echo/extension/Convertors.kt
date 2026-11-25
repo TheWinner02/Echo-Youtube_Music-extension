@@ -155,7 +155,7 @@ fun YtmPlaylist.toPlaylist(
             cover = thumbnail_provider?.getThumbnailUrl(quality)?.toImageHolder(mapOf()),
             authors = artists?.map { it.toUser(quality) }?.let { ModelTypeHelper.safeArtistListConversion(it) } ?: emptyList(),
             trackCount = item_count?.toLong(),
-            duration = total_duration?.toLong(),
+            duration = total_duration,
             creationDate = year?.let { yearStr -> 
                 parseYearString(yearStr)
             },
@@ -198,7 +198,7 @@ fun YtmPlaylist.toAlbum(
                 parseYearString(yearStr)
             },
             label = null,
-            duration = total_duration?.toLong(),
+            duration = total_duration,
             description = description,
         )
     } catch (e: Exception) {
@@ -239,7 +239,7 @@ fun YtmSong.toTrack(
             cover = thumbnail_provider?.getThumbnailUrl(quality)?.toImageHolder(crop = true)
                 ?: getCover(id, quality),
             album = album,
-            duration = duration?.toLong(),
+            duration = duration,
             plays = null,  
             releaseDate = album?.releaseDate,
             isExplicit = is_explicit,
@@ -325,8 +325,8 @@ fun YtmArtist.toUser(
     return try {
         val subscriberCountText = subscriber_count?.let { count ->
             when {
-                count >= 1000000 -> "${(count / 1000000).toInt()}M subscribers"
-                count >= 1000 -> "${(count / 1000).toInt()}K subscribers"
+                count >= 1000000 -> "${count / 1000000}M subscribers"
+                count >= 1000 -> "${count / 1000}K subscribers"
                 else -> ExtensionText.get("providers.1_d_subscribers_38c2a2", "%1\$d subscribers", count)
             }
         } ?: "Artist"
@@ -366,7 +366,7 @@ fun User.toArtist(): Artist {
         println("Failed to convert User to Artist: ${e.message}")
         Artist(
             id = id,
-            name = name ?: ExtensionText.get("providers.unknown_artist_fc0fb2", "Unknown Artist"),
+            name = name,
             cover = cover,
             bio = subtitle,
             extras = extras.toMutableMap().apply { put("genuineArtist", "true") }

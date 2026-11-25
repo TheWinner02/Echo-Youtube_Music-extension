@@ -56,7 +56,7 @@ class RealNewPipeVideoFormatsEndpoint {
                         }
 
                         val response = httpClient.newCall(builder.build()).execute()
-                        val body = response.body?.string()
+                        val body = response.body.string()
                         return Response(
                             response.code,
                             response.message,
@@ -106,15 +106,15 @@ class RealNewPipeVideoFormatsEndpoint {
             stream.isUrl &&  
             !stream.content.isNullOrEmpty() &&
             stream.itag > 0 &&
-            (maxQuality == null || (stream.height ?: 0) <= maxQuality)
+            (maxQuality == null || stream.height <= maxQuality)
         }
 
         println("Got ${videoOnlyStreams.size} video-only streams")
 
         val videoFormats = videoOnlyStreams.mapNotNull { videoStream ->
                 val itag = videoStream.itag
-                val urlStr = videoStream.content?.takeIf { it.isNotEmpty() } ?: return@mapNotNull null
-                val height = videoStream.height ?: 0
+                val urlStr = videoStream.content.takeIf { it.isNotEmpty() } ?: return@mapNotNull null
+                val height = videoStream.height
                 val fps = videoStream.fps
                 
             val mediaFormat = videoStream.format
@@ -139,7 +139,7 @@ class RealNewPipeVideoFormatsEndpoint {
             .filter { it.isUrl && !it.content.isNullOrEmpty() && it.itag > 0 }
             .mapNotNull { audioStream ->
                 val itag = audioStream.itag
-                val urlStr = audioStream.content?.takeIf { it.isNotEmpty() } ?: return@mapNotNull null
+                val urlStr = audioStream.content.takeIf { it.isNotEmpty() } ?: return@mapNotNull null
                 
                 val mediaFormat = audioStream.format
                 val mimeType = mediaFormat?.mimeType ?: "audio/unknown"
@@ -219,8 +219,8 @@ class RealNewPipeVideoFormatsEndpoint {
 
         val muxedFormats = muxedStreams.mapNotNull { videoStream ->
             val itag = videoStream.itag
-            val urlStr = videoStream.content?.takeIf { it.isNotEmpty() } ?: return@mapNotNull null
-            val height = videoStream.height ?: 0
+            val urlStr = videoStream.content.takeIf { it.isNotEmpty() } ?: return@mapNotNull null
+            val height = videoStream.height
             val fps = videoStream.fps
 
             val mediaFormat = videoStream.format
